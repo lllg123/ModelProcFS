@@ -28,6 +28,12 @@ pub(all) struct FileDescriptor {
 }
 
 ///|
+pub extend FdType with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend FdType with Eq::{not_equal, equal}
+
+///|
 /// Creates a validated file descriptor entry.
 pub fn FileDescriptor::new(
   fd~ : Int,
@@ -127,12 +133,13 @@ pub fn FdTable::list_by_type(self : FdTable, kind : FdType) -> Array[FileDescrip
 }
 
 ///|
-fn FileDescriptor::eq(self : FileDescriptor, other : FileDescriptor) -> Bool {
-  self.fd == other.fd && self.fd_type == other.fd_type && self.flags == other.flags
-}
-
-///|
 pub extend FileDescriptor with @moonbitlang/core/debug.Debug::{to_repr}
 
 ///|
+pub extend FileDescriptor with Eq::{not_equal, equal}
+
+///|
 pub extend FdTable with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend FdTable with Eq::{not_equal, equal}
