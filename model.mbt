@@ -9,6 +9,8 @@ pub(all) suberror ProcFSError {
   InvalidVmRSS(Int)
   InvalidFdNumber(Int)
   FdAlreadyExists(Int)
+  InvalidMemoryRange(Int, Int)
+  InvalidMemoryPerms(String)
 }
 
 ///|
