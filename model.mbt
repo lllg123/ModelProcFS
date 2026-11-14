@@ -11,6 +11,9 @@ pub(all) suberror ProcFSError {
   FdAlreadyExists(Int)
   InvalidMemoryRange(Int, Int)
   InvalidMemoryPerms(String)
+  ProcessNotFound(Int)
+  ProcessAlreadyExists(Int)
+  InvalidProcPath(String)
 }
 
 ///|

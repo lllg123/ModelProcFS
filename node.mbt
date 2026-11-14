@@ -125,6 +125,26 @@ pub fn ProcNode::add_child(self : ProcNode, child : ProcNode) -> Unit {
 }
 
 ///|
+/// Removes a direct child by name. Idempotent when the child is absent
+/// or when called on a non-directory.
+pub fn ProcNode::remove_child(self : ProcNode, name : String) -> Unit {
+  match self {
+    Directory(children~, ..) => {
+      let mut index = -1
+      for i, child in children {
+        if child.name() == name {
+          index = i
+        }
+      }
+      if index >= 0 {
+        ignore(children.remove(index))
+      }
+    }
+    _ => ()
+  }
+}
+
+///|
 pub extend ProcEntry with @moonbitlang/core/debug.Debug::{to_repr}
 
 ///|
