@@ -54,14 +54,14 @@ test "zero vm fields are valid for idle kernel threads" {
 ///|
 test "reject pid zero" {
   try {
-    @modelprocfs.Process::new(
+    let _ = @modelprocfs.Process::new(
       pid=0, ppid=0, name="test",
       state=@modelprocfs.ProcessState::Running,
       threads=1, vm_size_kb=1024, vm_rss_kb=512,
     )
     abort("expected ProcFSError")
   } catch {
-    ProcFSError::InvalidPid(0) => ()
+    @modelprocfs.ProcFSError::InvalidPid(0) => ()
     _ => abort("expected InvalidPid(0)")
   }
 }
@@ -69,14 +69,14 @@ test "reject pid zero" {
 ///|
 test "reject negative pid" {
   try {
-    @modelprocfs.Process::new(
+    let _ = @modelprocfs.Process::new(
       pid=-1, ppid=0, name="test",
       state=@modelprocfs.ProcessState::Running,
       threads=1, vm_size_kb=1024, vm_rss_kb=512,
     )
     abort("expected ProcFSError")
   } catch {
-    ProcFSError::InvalidPid(-1) => ()
+    @modelprocfs.ProcFSError::InvalidPid(-1) => ()
     _ => abort("expected InvalidPid(-1)")
   }
 }
@@ -84,14 +84,14 @@ test "reject negative pid" {
 ///|
 test "reject empty process name" {
   try {
-    @modelprocfs.Process::new(
+    let _ = @modelprocfs.Process::new(
       pid=1, ppid=0, name="",
       state=@modelprocfs.ProcessState::Running,
       threads=1, vm_size_kb=1024, vm_rss_kb=512,
     )
     abort("expected ProcFSError")
   } catch {
-    ProcFSError::EmptyProcessName => ()
+    @modelprocfs.ProcFSError::EmptyProcessName => ()
     _ => abort("expected EmptyProcessName")
   }
 }
@@ -99,14 +99,14 @@ test "reject empty process name" {
 ///|
 test "reject negative thread count" {
   try {
-    @modelprocfs.Process::new(
+    let _ = @modelprocfs.Process::new(
       pid=1, ppid=0, name="test",
       state=@modelprocfs.ProcessState::Running,
       threads=-1, vm_size_kb=1024, vm_rss_kb=512,
     )
     abort("expected ProcFSError")
   } catch {
-    ProcFSError::InvalidThreadCount(-1) => ()
+    @modelprocfs.ProcFSError::InvalidThreadCount(-1) => ()
     _ => abort("expected InvalidThreadCount(-1)")
   }
 }
@@ -114,14 +114,14 @@ test "reject negative thread count" {
 ///|
 test "reject negative vm size" {
   try {
-    @modelprocfs.Process::new(
+    let _ = @modelprocfs.Process::new(
       pid=1, ppid=0, name="test",
       state=@modelprocfs.ProcessState::Running,
       threads=1, vm_size_kb=-1, vm_rss_kb=512,
     )
     abort("expected ProcFSError")
   } catch {
-    ProcFSError::InvalidVmSize(-1) => ()
+    @modelprocfs.ProcFSError::InvalidVmSize(-1) => ()
     _ => abort("expected InvalidVmSize(-1)")
   }
 }
@@ -129,14 +129,14 @@ test "reject negative vm size" {
 ///|
 test "reject negative vm rss" {
   try {
-    @modelprocfs.Process::new(
+    let _ = @modelprocfs.Process::new(
       pid=1, ppid=0, name="test",
       state=@modelprocfs.ProcessState::Running,
       threads=1, vm_size_kb=1024, vm_rss_kb=-1,
     )
     abort("expected ProcFSError")
   } catch {
-    ProcFSError::InvalidVmRSS(-1) => ()
+    @modelprocfs.ProcFSError::InvalidVmRSS(-1) => ()
     _ => abort("expected InvalidVmRSS(-1)")
   }
 }
