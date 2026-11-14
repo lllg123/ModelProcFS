@@ -1,15 +1,17 @@
 ///|
 /// Invalid /proc data encountered during construction or parsing.
+#derive(Debug, Eq)
 pub(all) suberror ProcFSError {
   InvalidPid(Int)
   EmptyProcessName
   InvalidThreadCount(Int)
   InvalidVmSize(Int)
   InvalidVmRSS(Int)
-} derive(Debug, Eq)
+}
 
 ///|
 /// The process state as reported by `/proc/[pid]/status` field `State:`.
+#derive(Debug, Eq)
 pub(all) enum ProcessState {
   Running      // R  — running or runnable
   Sleeping     // S  — interruptible sleep
@@ -19,13 +21,14 @@ pub(all) enum ProcessState {
   TracingStop  // t  — stopped by ptrace
   Dead         // X  — dead (rare)
   Idle         // I  — idle kernel thread
-} derive(Debug, Eq)
+}
 
 ///|
 /// The core process record modelled from `/proc/[pid]/status`.
 ///
 /// All fields are validated on construction. Pid must be positive, name must
 /// be non-empty, and numeric fields must be non-negative.
+#derive(Debug, Eq)
 pub(all) struct Process {
   pid : Int
   ppid : Int
@@ -34,7 +37,25 @@ pub(all) struct Process {
   threads : Int
   vm_size_kb : Int
   vm_rss_kb : Int
-} derive(Debug, Eq)
+}
+
+///|
+pub extend ProcFSError with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend ProcFSError with Eq::{not_equal, equal}
+
+///|
+pub extend ProcessState with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend ProcessState with Eq::{not_equal, equal}
+
+///|
+pub extend Process with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend Process with Eq::{not_equal, equal}
 
 ///|
 /// Creates a validated process record.
