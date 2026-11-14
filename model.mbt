@@ -7,6 +7,8 @@ pub(all) suberror ProcFSError {
   InvalidThreadCount(Int)
   InvalidVmSize(Int)
   InvalidVmRSS(Int)
+  InvalidFdNumber(Int)
+  FdAlreadyExists(Int)
 }
 
 ///|
