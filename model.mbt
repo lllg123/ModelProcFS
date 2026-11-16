@@ -2,32 +2,33 @@
 /// Invalid /proc data encountered during construction or parsing.
 #derive(Debug, Eq)
 pub(all) suberror ProcFSError {
-  InvalidPid(Int)
+  InvalidPid(Int32)
   EmptyProcessName
-  InvalidThreadCount(Int)
-  InvalidVmSize(Int)
-  InvalidVmRSS(Int)
-  InvalidFdNumber(Int)
-  FdAlreadyExists(Int)
-  InvalidMemoryRange(Int, Int)
+  InvalidThreadCount(Int32)
+  InvalidVmSize(Int32)
+  InvalidVmRSS(Int32)
+  InvalidFdNumber(Int32)
+  FdAlreadyExists(Int32)
+  InvalidMemoryRange(Int32, Int32)
   InvalidMemoryPerms(String)
-  ProcessNotFound(Int)
-  ProcessAlreadyExists(Int)
+  ProcessNotFound(Int32)
+  ProcessAlreadyExists(Int32)
   InvalidProcPath(String)
+  ParseError(String)
 }
 
 ///|
 /// The process state as reported by `/proc/[pid]/status` field `State:`.
 #derive(Debug, Eq)
 pub(all) enum ProcessState {
-  Running      // R  — running or runnable
-  Sleeping     // S  — interruptible sleep
-  DiskSleep    // D  — uninterruptible disk sleep
-  Zombie       // Z  — terminated but not reaped
-  Stopped      // T  — stopped by signal
-  TracingStop  // t  — stopped by ptrace
-  Dead         // X  — dead (rare)
-  Idle         // I  — idle kernel thread
+  Running // R  — running or runnable
+  Sleeping // S  — interruptible sleep
+  DiskSleep // D  — uninterruptible disk sleep
+  Zombie // Z  — terminated but not reaped
+  Stopped // T  — stopped by signal
+  TracingStop // t  — stopped by ptrace
+  Dead // X  — dead (rare)
+  Idle // I  — idle kernel thread
 }
 
 ///|
@@ -37,13 +38,13 @@ pub(all) enum ProcessState {
 /// be non-empty, and numeric fields must be non-negative.
 #derive(Debug, Eq)
 pub(all) struct Process {
-  pid : Int
-  ppid : Int
+  pid : Int32
+  ppid : Int32
   name : String
   state : ProcessState
-  threads : Int
-  vm_size_kb : Int
-  vm_rss_kb : Int
+  threads : Int32
+  vm_size_kb : Int32
+  vm_rss_kb : Int32
 }
 
 ///|
@@ -69,13 +70,13 @@ pub extend Process with Eq::{not_equal, equal}
 ///
 /// Initiates the top-level process with a ppid of 0.
 pub fn Process::new(
-  pid~ : Int,
-  ppid~ : Int,
+  pid~ : Int32,
+  ppid~ : Int32,
   name~ : String,
   state~ : ProcessState,
-  threads~ : Int,
-  vm_size_kb~ : Int,
-  vm_rss_kb~ : Int,
+  threads~ : Int32,
+  vm_size_kb~ : Int32,
+  vm_rss_kb~ : Int32,
 ) -> Process raise ProcFSError {
   if pid <= 0 {
     raise ProcFSError::InvalidPid(pid)
@@ -92,7 +93,7 @@ pub fn Process::new(
   if vm_rss_kb < 0 {
     raise ProcFSError::InvalidVmRSS(vm_rss_kb)
   }
-  { pid, ppid, name, state, threads, vm_size_kb, vm_rss_kb }
+  { pid, ppid, name, state, threads, vm_size_kb, vm_rss_kb, }
 }
 
 ///|
