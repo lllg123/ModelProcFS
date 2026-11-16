@@ -1,5 +1,5 @@
 import {
-  "jjyiiuy/modelprocfs",
+  "lllg123/modelprocfs",
 }
 
 pkgtype(kind: "executable")

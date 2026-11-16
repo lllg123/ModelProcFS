@@ -9,9 +9,13 @@
 //   "moonbitlang/x@0.4.6",
 // }
 
-name = "jjyiiuy/modelprocfs"
+name = "lllg123/modelprocfs"
 
 version = "0.1.0"
+
+readme = "README.md"
+
+repository = "https://github.com/lllg123/modelprocfs"
 
 license = "Apache-2.0"
 
