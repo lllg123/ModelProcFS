@@ -1,0 +1,5 @@
+import {
+  "jjyiiuy/modelprocfs",
+}
+
+pkgtype(kind: "executable")
