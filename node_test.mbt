@@ -28,9 +28,7 @@ test "directory node with children" {
   assert_true(root.is_directory())
   assert_false(root.is_file())
   assert_eq(root.child_names(), [])
-  root.add_child(
-    @modelprocfs.ProcNode::Directory(name="1", children=[]),
-  )
+  root.add_child(@modelprocfs.ProcNode::Directory(name="1", children=[]))
   root.add_child(
     @modelprocfs.ProcNode::File(
       name="version",
@@ -88,10 +86,7 @@ test "symlink node properties" {
 
 ///|
 test "table entry content" {
-  let rows = [
-    ["clk", "cpu0", "cpu1"],
-    ["MHZ", "2400", "2400"],
-  ]
+  let rows = [["clk", "cpu0", "cpu1"], ["MHZ", "2400", "2400"]]
   let entry = @modelprocfs.ProcEntry::Table(rows)
   let node = @modelprocfs.ProcNode::File(name="cpuinfo", content=entry)
   assert_true(node.is_file())

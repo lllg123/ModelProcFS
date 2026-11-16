@@ -19,7 +19,9 @@ pub fn MemPerms::new(
   private~ : Bool,
 ) -> MemPerms raise ProcFSError {
   if shared && private {
-    raise ProcFSError::InvalidMemoryPerms("shared and private cannot both be set")
+    raise ProcFSError::InvalidMemoryPerms(
+      "shared and private cannot both be set",
+    )
   }
   { read, write, execute, shared, private, }
 }
@@ -49,9 +51,8 @@ pub fn MemPerms::from_string(s : String) -> MemPerms? {
     _ => None
   }
   match private {
-    Some(p) => Some(try! MemPerms::new(
-      read~, write~, execute~, shared=!p, private=p,
-    ))
+    Some(p) =>
+      Some(try! MemPerms::new(read~, write~, execute~, shared=!p, private=p))
     None => None
   }
 }
@@ -63,13 +64,13 @@ pub fn MemPerms::from_string(s : String) -> MemPerms? {
 /// pseudo-names are stored as plain string paths.
 #derive(Debug, Eq)
 pub(all) struct MemoryRegion {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
   perms : MemPerms
-  offset : Int
-  dev_major : Int
-  dev_minor : Int
-  inode : Int
+  offset : Int32
+  dev_major : Int32
+  dev_minor : Int32
+  inode : Int32
   path : String?
 }
 
@@ -78,13 +79,13 @@ pub(all) struct MemoryRegion {
 ///
 /// Raises when `start >= end` or any numeric field is negative.
 pub fn MemoryRegion::new(
-  start~ : Int,
-  end~ : Int,
+  start~ : Int32,
+  end~ : Int32,
   perms~ : MemPerms,
-  offset~ : Int,
-  dev_major~ : Int,
-  dev_minor~ : Int,
-  inode~ : Int,
+  offset~ : Int32,
+  dev_major~ : Int32,
+  dev_minor~ : Int32,
+  inode~ : Int32,
   path~ : String?,
 ) -> MemoryRegion raise ProcFSError {
   if start >= end {
@@ -98,7 +99,7 @@ pub fn MemoryRegion::new(
 
 ///|
 /// Size of this region in bytes.
-pub fn MemoryRegion::size(self : MemoryRegion) -> Int {
+pub fn MemoryRegion::size(self : MemoryRegion) -> Int32 {
   self.end - self.start
 }
 
@@ -132,13 +133,13 @@ pub fn MemoryMap::add(self : MemoryMap, region : MemoryRegion) -> Unit {
 
 ///|
 /// Number of mapped regions.
-pub fn MemoryMap::count(self : MemoryMap) -> Int {
+pub fn MemoryMap::count(self : MemoryMap) -> Int32 {
   self.regions.length()
 }
 
 ///|
 /// Total virtual memory in bytes across all regions.
-pub fn MemoryMap::total_size(self : MemoryMap) -> Int {
+pub fn MemoryMap::total_size(self : MemoryMap) -> Int32 {
   let mut total = 0
   for region in self.regions {
     total = total + region.size()
@@ -148,7 +149,7 @@ pub fn MemoryMap::total_size(self : MemoryMap) -> Int {
 
 ///|
 /// Total anonymous (heap/stack/mmap) bytes.
-pub fn MemoryMap::anonymous_size(self : MemoryMap) -> Int {
+pub fn MemoryMap::anonymous_size(self : MemoryMap) -> Int32 {
   let mut total = 0
   for region in self.regions {
     if region.is_anonymous() {
@@ -160,7 +161,7 @@ pub fn MemoryMap::anonymous_size(self : MemoryMap) -> Int {
 
 ///|
 /// Returns the region that contains `addr`, or `None`.
-pub fn MemoryMap::find_region(self : MemoryMap, addr : Int) -> MemoryRegion? {
+pub fn MemoryMap::find_region(self : MemoryMap, addr : Int32) -> MemoryRegion? {
   for region in self.regions {
     if addr >= region.start && addr < region.end {
       return Some(region)

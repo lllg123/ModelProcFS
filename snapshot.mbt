@@ -21,33 +21,36 @@ pub fn ProcFSSnapshot::new(
     let pid = pids[i]
     match tree.get_process_node(pid) {
       None => ()
-      Some(node) => match node.find_child("status") {
-        None => ()
-        Some(status) => match status.lookup("Name") {
+      Some(node) =>
+        match node.find_child("status") {
           None => ()
-          Some(name) => match status.lookup("State") {
-            None => ()
-            Some(state_code) =>
-              match ProcessState::from_code(state_code[:1].to_owned()) {
-                None => ()
-                Some(s) => {
-                  let process = try Process::new(
-                    pid~,
-                    ppid=parse_pid_field(status, "PPid"),
-                    name~,
-                    state=s,
-                    threads=parse_int_field(status, "Threads"),
-                    vm_size_kb=parse_kb_field(status, "VmSize"),
-                    vm_rss_kb=parse_kb_field(status, "VmRSS"),
-                  ) catch {
-                    _ => continue
-                  }
-                  results.push(process)
+          Some(status) =>
+            match status.lookup("Name") {
+              None => ()
+              Some(name) =>
+                match status.lookup("State") {
+                  None => ()
+                  Some(state_code) =>
+                    match ProcessState::from_code(state_code[:1].to_owned()) {
+                      None => ()
+                      Some(s) => {
+                        let process = Process::new(
+                          pid~,
+                          ppid=parse_pid_field(status, "PPid"),
+                          name~,
+                          state=s,
+                          threads=parse_int_field(status, "Threads"),
+                          vm_size_kb=parse_kb_field(status, "VmSize"),
+                          vm_rss_kb=parse_kb_field(status, "VmRSS"),
+                        ) catch {
+                          _ => continue
+                        }
+                        results.push(process)
+                      }
+                    }
                 }
-              }
-          }
+            }
         }
-      }
     }
   }
   { captured_at, processes: results, }
@@ -103,16 +106,17 @@ pub fn diff_snapshots(
     let p = after.processes[i]
     match find_proc(before, p.pid) {
       Some(_) => ()
-      None => diffs.push({
-        pid: p.pid,
-        added: true,
-        removed: false,
-        state_changed: false,
-        from_state: None,
-        to_state: Some(p.state),
-        vm_rss_delta_kb: p.vm_rss_kb,
-        thread_delta: p.threads,
-      })
+      None =>
+        diffs.push({
+          pid: p.pid,
+          added: true,
+          removed: false,
+          state_changed: false,
+          from_state: None,
+          to_state: Some(p.state),
+          vm_rss_delta_kb: p.vm_rss_kb,
+          thread_delta: p.threads,
+        })
     }
   }
 
@@ -121,16 +125,17 @@ pub fn diff_snapshots(
     let p = before.processes[i]
     match find_proc(after, p.pid) {
       Some(_) => ()
-      None => diffs.push({
-        pid: p.pid,
-        added: false,
-        removed: true,
-        state_changed: false,
-        from_state: Some(p.state),
-        to_state: None,
-        vm_rss_delta_kb: -p.vm_rss_kb,
-        thread_delta: -p.threads,
-      })
+      None =>
+        diffs.push({
+          pid: p.pid,
+          added: false,
+          removed: true,
+          state_changed: false,
+          from_state: Some(p.state),
+          to_state: None,
+          vm_rss_delta_kb: -p.vm_rss_kb,
+          thread_delta: -p.threads,
+        })
     }
   }
 
@@ -140,7 +145,9 @@ pub fn diff_snapshots(
     match find_proc(before, a.pid) {
       None => ()
       Some(b) =>
-        if a.state != b.state || a.vm_rss_kb != b.vm_rss_kb || a.threads != b.threads {
+        if a.state != b.state ||
+          a.vm_rss_kb != b.vm_rss_kb ||
+          a.threads != b.threads {
           diffs.push({
             pid: a.pid,
             added: false,
@@ -157,11 +164,7 @@ pub fn diff_snapshots(
     }
   }
 
-  {
-    before: before.captured_at,
-    after: after.captured_at,
-    diffs,
-  }
+  { before: before.captured_at, after: after.captured_at, diffs, }
 }
 
 ///|

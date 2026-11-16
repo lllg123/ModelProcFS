@@ -3,20 +3,29 @@ test "snapshot captures all processes" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=42, ppid=1, name="sshd",
+      pid=42,
+      ppid=1,
+      name="sshd",
       state=@modelprocfs.ProcessState::Running,
-      threads=2, vm_size_kb=32768, vm_rss_kb=4096,
+      threads=2,
+      vm_size_kb=32768,
+      vm_rss_kb=4096,
     ),
   )
   let snap = @modelprocfs.ProcFSSnapshot::new(
-    captured_at="2026-01-15T10:00:00Z", tree,
+    captured_at="2026-01-15T10:00:00Z",
+    tree,
   )
   assert_eq(snap.captured_at, "2026-01-15T10:00:00Z")
   assert_eq(snap.processes.length(), 2)
@@ -25,9 +34,7 @@ test "snapshot captures all processes" {
 ///|
 test "empty snapshot has no processes" {
   let tree = @modelprocfs.ProcTree::new()
-  let snap = @modelprocfs.ProcFSSnapshot::new(
-    captured_at="T0", tree,
-  )
+  let snap = @modelprocfs.ProcFSSnapshot::new(captured_at="T0", tree)
   assert_eq(snap.processes.length(), 0)
 }
 
@@ -36,17 +43,25 @@ test "diff detects added process" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   let before = @modelprocfs.ProcFSSnapshot::new(captured_at="T1", tree)
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=42, ppid=1, name="sshd",
+      pid=42,
+      ppid=1,
+      name="sshd",
       state=@modelprocfs.ProcessState::Running,
-      threads=2, vm_size_kb=32768, vm_rss_kb=8192,
+      threads=2,
+      vm_size_kb=32768,
+      vm_rss_kb=8192,
     ),
   )
   let after = @modelprocfs.ProcFSSnapshot::new(captured_at="T2", tree)
@@ -61,9 +76,13 @@ test "diff detects removed process" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   let before = @modelprocfs.ProcFSSnapshot::new(captured_at="T1", tree)
@@ -80,18 +99,26 @@ test "diff detects state change" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   let before = @modelprocfs.ProcFSSnapshot::new(captured_at="T1", tree)
   tree.remove_process(1)
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Zombie,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   let after = @modelprocfs.ProcFSSnapshot::new(captured_at="T2", tree)
@@ -111,9 +138,13 @@ test "diff with no changes is empty" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   let before = @modelprocfs.ProcFSSnapshot::new(captured_at="T1", tree)
@@ -137,9 +168,13 @@ test "diff summary includes added process" {
   let before = @modelprocfs.ProcFSSnapshot::new(captured_at="T1", tree)
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   let after = @modelprocfs.ProcFSSnapshot::new(captured_at="T2", tree)
@@ -154,18 +189,26 @@ test "process diff vm_rss_delta tracks changes" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=10000,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=10000,
     ),
   )
   let before = @modelprocfs.ProcFSSnapshot::new(captured_at="T1", tree)
   tree.remove_process(1)
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=15000,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=15000,
     ),
   )
   let after = @modelprocfs.ProcFSSnapshot::new(captured_at="T2", tree)

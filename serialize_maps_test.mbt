@@ -1,14 +1,22 @@
 ///|
 test "serialize single region with path" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=false, execute=true, shared=false, private=true,
+    read=true,
+    write=false,
+    execute=true,
+    shared=false,
+    private=true,
   )
   let map = @modelprocfs.MemoryMap::new()
   map.add(
     @modelprocfs.MemoryRegion::new(
-      start=0x7f000000, end=0x7f001000,
-      perms=perms, offset=0,
-      dev_major=8, dev_minor=1, inode=12345,
+      start=0x7f000000,
+      end=0x7f001000,
+      perms~,
+      offset=0,
+      dev_major=8,
+      dev_minor=1,
+      inode=12345,
       path=Some("/usr/lib/libc.so"),
     ),
   )
@@ -20,14 +28,23 @@ test "serialize single region with path" {
 ///|
 test "serialize anonymous region omits path" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=true, execute=false, shared=false, private=true,
+    read=true,
+    write=true,
+    execute=false,
+    shared=false,
+    private=true,
   )
   let map = @modelprocfs.MemoryMap::new()
   map.add(
     @modelprocfs.MemoryRegion::new(
-      start=0x1000, end=0x2000,
-      perms=perms, offset=0x1000,
-      dev_major=0, dev_minor=0, inode=0, path=None,
+      start=0x1000,
+      end=0x2000,
+      perms~,
+      offset=0x1000,
+      dev_major=0,
+      dev_minor=0,
+      inode=0,
+      path=None,
     ),
   )
   let s = @modelprocfs.serialize_maps(map)
@@ -37,19 +54,35 @@ test "serialize anonymous region omits path" {
 ///|
 test "serialize multiple regions joined by newline" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=false, execute=false, shared=false, private=true,
+    read=true,
+    write=false,
+    execute=false,
+    shared=false,
+    private=true,
   )
   let map = @modelprocfs.MemoryMap::new()
   map.add(
     @modelprocfs.MemoryRegion::new(
-      start=0, end=0x1000, perms=perms, offset=0,
-      dev_major=8, dev_minor=1, inode=1, path=Some("/a"),
+      start=0,
+      end=0x1000,
+      perms~,
+      offset=0,
+      dev_major=8,
+      dev_minor=1,
+      inode=1,
+      path=Some("/a"),
     ),
   )
   map.add(
     @modelprocfs.MemoryRegion::new(
-      start=0x1000, end=0x3000, perms=perms, offset=0,
-      dev_major=0, dev_minor=0, inode=0, path=None,
+      start=0x1000,
+      end=0x3000,
+      perms~,
+      offset=0,
+      dev_major=0,
+      dev_minor=0,
+      inode=0,
+      path=None,
     ),
   )
   let s = @modelprocfs.serialize_maps(map)
@@ -66,13 +99,23 @@ test "serialize empty map returns empty string" {
 ///|
 test "serialize shared region uses s flag" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=true, execute=false, shared=true, private=false,
+    read=true,
+    write=true,
+    execute=false,
+    shared=true,
+    private=false,
   )
   let map = @modelprocfs.MemoryMap::new()
   map.add(
     @modelprocfs.MemoryRegion::new(
-      start=0, end=0x1000, perms=perms, offset=0,
-      dev_major=0, dev_minor=0, inode=0, path=None,
+      start=0,
+      end=0x1000,
+      perms~,
+      offset=0,
+      dev_major=0,
+      dev_minor=0,
+      inode=0,
+      path=None,
     ),
   )
   let s = @modelprocfs.serialize_maps(map)

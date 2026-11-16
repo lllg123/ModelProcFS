@@ -1,9 +1,13 @@
 ///|
 test "parse_status round-trip" {
   let original = @modelprocfs.Process::new(
-    pid=1, ppid=0, name="systemd",
+    pid=1,
+    ppid=0,
+    name="systemd",
     state=@modelprocfs.ProcessState::Sleeping,
-    threads=1, vm_size_kb=102400, vm_rss_kb=8192,
+    threads=1,
+    vm_size_kb=102400,
+    vm_rss_kb=8192,
   )
   let text = @modelprocfs.serialize_status(original)
   let parsed = @modelprocfs.parse_status(text)
@@ -19,9 +23,13 @@ test "parse_status round-trip" {
 ///|
 test "parse_status running process round-trip" {
   let original = @modelprocfs.Process::new(
-    pid=4242, ppid=1, name="my-daemon",
+    pid=4242,
+    ppid=1,
+    name="my-daemon",
     state=@modelprocfs.ProcessState::Running,
-    threads=8, vm_size_kb=256000, vm_rss_kb=32768,
+    threads=8,
+    vm_size_kb=256000,
+    vm_rss_kb=32768,
   )
   let text = @modelprocfs.serialize_status(original)
   let parsed = @modelprocfs.parse_status(text)
@@ -33,9 +41,13 @@ test "parse_status running process round-trip" {
 ///|
 test "parse_status zombie process round-trip" {
   let original = @modelprocfs.Process::new(
-    pid=99, ppid=1, name="defunct",
+    pid=99,
+    ppid=1,
+    name="defunct",
     state=@modelprocfs.ProcessState::Zombie,
-    threads=0, vm_size_kb=0, vm_rss_kb=0,
+    threads=0,
+    vm_size_kb=0,
+    vm_rss_kb=0,
   )
   let text = @modelprocfs.serialize_status(original)
   let parsed = @modelprocfs.parse_status(text)
@@ -59,13 +71,22 @@ test "parse_status rejects empty text" {
 ///|
 test "parse_maps round-trip" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=false, execute=true, shared=false, private=true,
+    read=true,
+    write=false,
+    execute=true,
+    shared=false,
+    private=true,
   )
   let original = @modelprocfs.MemoryMap::new()
   original.add(
     @modelprocfs.MemoryRegion::new(
-      start=0x7f000000, end=0x7f001000, perms=perms, offset=0,
-      dev_major=8, dev_minor=1, inode=12345,
+      start=0x7f000000,
+      end=0x7f001000,
+      perms~,
+      offset=0,
+      dev_major=8,
+      dev_minor=1,
+      inode=12345,
       path=Some("/usr/lib/libc.so"),
     ),
   )
@@ -81,13 +102,23 @@ test "parse_maps round-trip" {
 ///|
 test "parse_maps anonymous region round-trip" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=true, execute=false, shared=false, private=true,
+    read=true,
+    write=true,
+    execute=false,
+    shared=false,
+    private=true,
   )
   let original = @modelprocfs.MemoryMap::new()
   original.add(
     @modelprocfs.MemoryRegion::new(
-      start=0x1000, end=0x2000, perms=perms, offset=0x1000,
-      dev_major=0, dev_minor=0, inode=0, path=None,
+      start=0x1000,
+      end=0x2000,
+      perms~,
+      offset=0x1000,
+      dev_major=0,
+      dev_minor=0,
+      inode=0,
+      path=None,
     ),
   )
   let text = @modelprocfs.serialize_maps(original)
@@ -105,19 +136,35 @@ test "parse_maps empty input" {
 ///|
 test "parse_maps multiple regions round-trip" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=false, execute=false, shared=false, private=true,
+    read=true,
+    write=false,
+    execute=false,
+    shared=false,
+    private=true,
   )
   let original = @modelprocfs.MemoryMap::new()
   original.add(
     @modelprocfs.MemoryRegion::new(
-      start=0, end=0x1000, perms=perms, offset=0,
-      dev_major=8, dev_minor=1, inode=1, path=Some("/a"),
+      start=0,
+      end=0x1000,
+      perms~,
+      offset=0,
+      dev_major=8,
+      dev_minor=1,
+      inode=1,
+      path=Some("/a"),
     ),
   )
   original.add(
     @modelprocfs.MemoryRegion::new(
-      start=0x1000, end=0x3000, perms=perms, offset=0,
-      dev_major=0, dev_minor=0, inode=0, path=None,
+      start=0x1000,
+      end=0x3000,
+      perms~,
+      offset=0,
+      dev_major=0,
+      dev_minor=0,
+      inode=0,
+      path=None,
     ),
   )
   let text = @modelprocfs.serialize_maps(original)

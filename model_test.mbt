@@ -55,9 +55,13 @@ test "zero vm fields are valid for idle kernel threads" {
 test "reject pid zero" {
   try {
     let _ = @modelprocfs.Process::new(
-      pid=0, ppid=0, name="test",
+      pid=0,
+      ppid=0,
+      name="test",
       state=@modelprocfs.ProcessState::Running,
-      threads=1, vm_size_kb=1024, vm_rss_kb=512,
+      threads=1,
+      vm_size_kb=1024,
+      vm_rss_kb=512,
     )
     abort("expected ProcFSError")
   } catch {
@@ -70,9 +74,13 @@ test "reject pid zero" {
 test "reject negative pid" {
   try {
     let _ = @modelprocfs.Process::new(
-      pid=-1, ppid=0, name="test",
+      pid=-1,
+      ppid=0,
+      name="test",
       state=@modelprocfs.ProcessState::Running,
-      threads=1, vm_size_kb=1024, vm_rss_kb=512,
+      threads=1,
+      vm_size_kb=1024,
+      vm_rss_kb=512,
     )
     abort("expected ProcFSError")
   } catch {
@@ -85,9 +93,13 @@ test "reject negative pid" {
 test "reject empty process name" {
   try {
     let _ = @modelprocfs.Process::new(
-      pid=1, ppid=0, name="",
+      pid=1,
+      ppid=0,
+      name="",
       state=@modelprocfs.ProcessState::Running,
-      threads=1, vm_size_kb=1024, vm_rss_kb=512,
+      threads=1,
+      vm_size_kb=1024,
+      vm_rss_kb=512,
     )
     abort("expected ProcFSError")
   } catch {
@@ -100,9 +112,13 @@ test "reject empty process name" {
 test "reject negative thread count" {
   try {
     let _ = @modelprocfs.Process::new(
-      pid=1, ppid=0, name="test",
+      pid=1,
+      ppid=0,
+      name="test",
       state=@modelprocfs.ProcessState::Running,
-      threads=-1, vm_size_kb=1024, vm_rss_kb=512,
+      threads=-1,
+      vm_size_kb=1024,
+      vm_rss_kb=512,
     )
     abort("expected ProcFSError")
   } catch {
@@ -115,9 +131,13 @@ test "reject negative thread count" {
 test "reject negative vm size" {
   try {
     let _ = @modelprocfs.Process::new(
-      pid=1, ppid=0, name="test",
+      pid=1,
+      ppid=0,
+      name="test",
       state=@modelprocfs.ProcessState::Running,
-      threads=1, vm_size_kb=-1, vm_rss_kb=512,
+      threads=1,
+      vm_size_kb=-1,
+      vm_rss_kb=512,
     )
     abort("expected ProcFSError")
   } catch {
@@ -130,9 +150,13 @@ test "reject negative vm size" {
 test "reject negative vm rss" {
   try {
     let _ = @modelprocfs.Process::new(
-      pid=1, ppid=0, name="test",
+      pid=1,
+      ppid=0,
+      name="test",
       state=@modelprocfs.ProcessState::Running,
-      threads=1, vm_size_kb=1024, vm_rss_kb=-1,
+      threads=1,
+      vm_size_kb=1024,
+      vm_rss_kb=-1,
     )
     abort("expected ProcFSError")
   } catch {

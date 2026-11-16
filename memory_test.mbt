@@ -1,12 +1,16 @@
 ///|
 test "construct valid memory region" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=false, execute=true, shared=false, private=true,
+    read=true,
+    write=false,
+    execute=true,
+    shared=false,
+    private=true,
   )
   let r = @modelprocfs.MemoryRegion::new(
     start=0x7f000000,
     end=0x7f001000,
-    perms=perms,
+    perms~,
     offset=0,
     dev_major=8,
     dev_minor=1,
@@ -22,12 +26,16 @@ test "construct valid memory region" {
 ///|
 test "anonymous region has no path" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=true, execute=false, shared=false, private=true,
+    read=true,
+    write=true,
+    execute=false,
+    shared=false,
+    private=true,
   )
   let r = @modelprocfs.MemoryRegion::new(
     start=0x7fff0000,
     end=0x7fff2000,
-    perms=perms,
+    perms~,
     offset=0,
     dev_major=0,
     dev_minor=0,
@@ -41,13 +49,22 @@ test "anonymous region has no path" {
 ///|
 test "reject start >= end" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=false, execute=false, shared=false, private=true,
+    read=true,
+    write=false,
+    execute=false,
+    shared=false,
+    private=true,
   )
   try {
     let _ = @modelprocfs.MemoryRegion::new(
-      start=0x1000, end=0x1000,
-      perms=perms, offset=0,
-      dev_major=0, dev_minor=0, inode=0, path=None,
+      start=0x1000,
+      end=0x1000,
+      perms~,
+      offset=0,
+      dev_major=0,
+      dev_minor=0,
+      inode=0,
+      path=None,
     )
     abort("expected ProcFSError")
   } catch {
@@ -59,11 +76,19 @@ test "reject start >= end" {
 ///|
 test "memperms to_string" {
   let p = @modelprocfs.MemPerms::new(
-    read=true, write=false, execute=true, shared=false, private=true,
+    read=true,
+    write=false,
+    execute=true,
+    shared=false,
+    private=true,
   )
   assert_eq(p.to_string(), "r-xp")
   let p2 = @modelprocfs.MemPerms::new(
-    read=true, write=true, execute=false, shared=true, private=false,
+    read=true,
+    write=true,
+    execute=false,
+    shared=true,
+    private=false,
   )
   assert_eq(p2.to_string(), "rw-s")
 }
@@ -89,7 +114,11 @@ test "memperms from_string returns None for bogus input" {
 test "memperms shared+private raises" {
   try {
     let _ = @modelprocfs.MemPerms::new(
-      read=true, write=false, execute=false, shared=true, private=true,
+      read=true,
+      write=false,
+      execute=false,
+      shared=true,
+      private=true,
     )
     abort("expected ProcFSError")
   } catch {
@@ -101,19 +130,35 @@ test "memperms shared+private raises" {
 ///|
 test "memory map total and anonymous size" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=false, execute=false, shared=false, private=true,
+    read=true,
+    write=false,
+    execute=false,
+    shared=false,
+    private=true,
   )
   let map = @modelprocfs.MemoryMap::new()
   map.add(
     @modelprocfs.MemoryRegion::new(
-      start=0, end=0x1000, perms=perms, offset=0,
-      dev_major=8, dev_minor=1, inode=1, path=Some("/a"),
+      start=0,
+      end=0x1000,
+      perms~,
+      offset=0,
+      dev_major=8,
+      dev_minor=1,
+      inode=1,
+      path=Some("/a"),
     ),
   )
   map.add(
     @modelprocfs.MemoryRegion::new(
-      start=0x1000, end=0x3000, perms=perms, offset=0,
-      dev_major=0, dev_minor=0, inode=0, path=None,
+      start=0x1000,
+      end=0x3000,
+      perms~,
+      offset=0,
+      dev_major=0,
+      dev_minor=0,
+      inode=0,
+      path=None,
     ),
   )
   assert_eq(map.count(), 2)
@@ -124,19 +169,35 @@ test "memory map total and anonymous size" {
 ///|
 test "find region by address" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=true, execute=false, shared=false, private=true,
+    read=true,
+    write=true,
+    execute=false,
+    shared=false,
+    private=true,
   )
   let map = @modelprocfs.MemoryMap::new()
   map.add(
     @modelprocfs.MemoryRegion::new(
-      start=0x1000, end=0x2000, perms=perms, offset=0,
-      dev_major=0, dev_minor=0, inode=0, path=None,
+      start=0x1000,
+      end=0x2000,
+      perms~,
+      offset=0,
+      dev_major=0,
+      dev_minor=0,
+      inode=0,
+      path=None,
     ),
   )
   map.add(
     @modelprocfs.MemoryRegion::new(
-      start=0x2000, end=0x3000, perms=perms, offset=0,
-      dev_major=8, dev_minor=1, inode=2, path=Some("/lib/x.so"),
+      start=0x2000,
+      end=0x3000,
+      perms~,
+      offset=0,
+      dev_major=8,
+      dev_minor=1,
+      inode=2,
+      path=Some("/lib/x.so"),
     ),
   )
   assert_true(map.find_region(0x1500) is Some(_))
@@ -148,25 +209,47 @@ test "find region by address" {
 ///|
 test "regions_by_path groups matching regions" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=false, execute=true, shared=false, private=true,
+    read=true,
+    write=false,
+    execute=true,
+    shared=false,
+    private=true,
   )
   let map = @modelprocfs.MemoryMap::new()
   map.add(
     @modelprocfs.MemoryRegion::new(
-      start=0, end=0x1000, perms=perms, offset=0,
-      dev_major=8, dev_minor=1, inode=1, path=Some("/usr/lib/libc.so"),
+      start=0,
+      end=0x1000,
+      perms~,
+      offset=0,
+      dev_major=8,
+      dev_minor=1,
+      inode=1,
+      path=Some("/usr/lib/libc.so"),
     ),
   )
   map.add(
     @modelprocfs.MemoryRegion::new(
-      start=0x1000, end=0x2000, perms=perms, offset=0,
-      dev_major=8, dev_minor=1, inode=2, path=Some("/usr/lib/libm.so"),
+      start=0x1000,
+      end=0x2000,
+      perms~,
+      offset=0,
+      dev_major=8,
+      dev_minor=1,
+      inode=2,
+      path=Some("/usr/lib/libm.so"),
     ),
   )
   map.add(
     @modelprocfs.MemoryRegion::new(
-      start=0x2000, end=0x3000, perms=perms, offset=0x1000,
-      dev_major=8, dev_minor=1, inode=1, path=Some("/usr/lib/libc.so"),
+      start=0x2000,
+      end=0x3000,
+      perms~,
+      offset=0x1000,
+      dev_major=8,
+      dev_minor=1,
+      inode=1,
+      path=Some("/usr/lib/libc.so"),
     ),
   )
   let matches = map.regions_by_path("/usr/lib/libc.so")
@@ -181,11 +264,21 @@ test "regions_by_path groups matching regions" {
 ///|
 test "offset can be zero" {
   let perms = @modelprocfs.MemPerms::new(
-    read=true, write=false, execute=false, shared=false, private=true,
+    read=true,
+    write=false,
+    execute=false,
+    shared=false,
+    private=true,
   )
   let r = @modelprocfs.MemoryRegion::new(
-    start=0, end=0x1000, perms=perms, offset=0,
-    dev_major=0, dev_minor=0, inode=0, path=None,
+    start=0,
+    end=0x1000,
+    perms~,
+    offset=0,
+    dev_major=0,
+    dev_minor=0,
+    inode=0,
+    path=None,
   )
   assert_eq(r.offset, 0)
   assert_eq(r.dev_major, 0)

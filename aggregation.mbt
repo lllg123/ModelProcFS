@@ -49,7 +49,10 @@ pub fn SystemStats::count_for(self : SystemStats, st : ProcessState) -> Int32 {
 ///
 /// Processes are reconstructed from their `/proc/<pid>/status` nodes.
 /// Missing or malformed processes are silently skipped.
-pub fn compute_stats(tree : ProcTree, fd_tables~ : Map[Int32, FdTable]? = None) -> SystemStats {
+pub fn compute_stats(
+  tree : ProcTree,
+  fd_tables~ : Map[Int32, FdTable]? = None,
+) -> SystemStats {
   let pids = tree.list_pids()
   let mut total = 0
   let mut total_threads = 0
@@ -61,35 +64,40 @@ pub fn compute_stats(tree : ProcTree, fd_tables~ : Map[Int32, FdTable]? = None) 
     let pid = pids[i]
     match tree.get_process_node(pid) {
       None => ()
-      Some(node) => match node.find_child("status") {
-        None => ()
-        Some(status) => match status.lookup("Pid") {
+      Some(node) =>
+        match node.find_child("status") {
           None => ()
-          Some(_) => match status.lookup("State") {
-            None => ()
-            Some(sc) => match ProcessState::from_code(sc[:1].to_owned()) {
+          Some(status) =>
+            match status.lookup("Pid") {
               None => ()
-              Some(st) => {
-                total = total + 1
-                let tc = parse_int_field(status, "Threads")
-                total_threads = total_threads + tc
-                let vs = parse_kb_field(status, "VmSize")
-                total_vm_kb = total_vm_kb + vs
-                let rs = parse_kb_field(status, "VmRSS")
-                total_rss_kb = total_rss_kb + rs
-                inc_state(counts, st)
-              }
+              Some(_) =>
+                match status.lookup("State") {
+                  None => ()
+                  Some(sc) =>
+                    match ProcessState::from_code(sc[:1].to_owned()) {
+                      None => ()
+                      Some(st) => {
+                        total = total + 1
+                        let tc = parse_int_field(status, "Threads")
+                        total_threads = total_threads + tc
+                        let vs = parse_kb_field(status, "VmSize")
+                        total_vm_kb = total_vm_kb + vs
+                        let rs = parse_kb_field(status, "VmRSS")
+                        total_rss_kb = total_rss_kb + rs
+                        inc_state(counts, st)
+                      }
+                    }
+                }
             }
-          }
         }
-      }
     }
     match fd_tables {
       None => ()
-      Some(tables) => match tables.get(pid) {
-        None => ()
-        Some(t) => total_fds = total_fds + t.entries.length()
-      }
+      Some(tables) =>
+        match tables.get(pid) {
+          None => ()
+          Some(t) => total_fds = total_fds + t.entries.length()
+        }
     }
   }
   {

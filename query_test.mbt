@@ -3,9 +3,13 @@ test "empty filter matches everything" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   let filter = @modelprocfs.ProcessFilter::new()
@@ -19,16 +23,24 @@ test "filter by name substring" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="systemd",
+      pid=1,
+      ppid=0,
+      name="systemd",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=102400, vm_rss_kb=8192,
+      threads=1,
+      vm_size_kb=102400,
+      vm_rss_kb=8192,
     ),
   )
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=42, ppid=1, name="sshd",
+      pid=42,
+      ppid=1,
+      name="sshd",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=2, vm_size_kb=32768, vm_rss_kb=4096,
+      threads=2,
+      vm_size_kb=32768,
+      vm_rss_kb=4096,
     ),
   )
   let filter = @modelprocfs.ProcessFilter::new().with_name_contains("ssh")
@@ -42,16 +54,24 @@ test "filter by state" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=7, ppid=1, name="worker",
+      pid=7,
+      ppid=1,
+      name="worker",
       state=@modelprocfs.ProcessState::Running,
-      threads=4, vm_size_kb=65536, vm_rss_kb=8192,
+      threads=4,
+      vm_size_kb=65536,
+      vm_rss_kb=8192,
     ),
   )
   let filter = @modelprocfs.ProcessFilter::new().with_state(
@@ -67,16 +87,24 @@ test "filter by rss range" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="small",
+      pid=1,
+      ppid=0,
+      name="small",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=2, ppid=1, name="big",
+      pid=2,
+      ppid=1,
+      name="big",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=8, vm_size_kb=256000, vm_rss_kb=32768,
+      threads=8,
+      vm_size_kb=256000,
+      vm_rss_kb=32768,
     ),
   )
   let filter = @modelprocfs.ProcessFilter::new()
@@ -92,16 +120,24 @@ test "filter by thread count range" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="a",
+      pid=1,
+      ppid=0,
+      name="a",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=1, vm_rss_kb=1,
+      threads=1,
+      vm_size_kb=1,
+      vm_rss_kb=1,
     ),
   )
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=2, ppid=0, name="b",
+      pid=2,
+      ppid=0,
+      name="b",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=8, vm_size_kb=1, vm_rss_kb=1,
+      threads=8,
+      vm_size_kb=1,
+      vm_rss_kb=1,
     ),
   )
   let filter = @modelprocfs.ProcessFilter::new().with_min_threads(4)
@@ -115,16 +151,24 @@ test "combined filter ANDs all criteria" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="sshd",
+      pid=1,
+      ppid=0,
+      name="sshd",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=100, vm_rss_kb=100,
+      threads=1,
+      vm_size_kb=100,
+      vm_rss_kb=100,
     ),
   )
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=2, ppid=0, name="sshd",
+      pid=2,
+      ppid=0,
+      name="sshd",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=4, vm_size_kb=100, vm_rss_kb=50000,
+      threads=4,
+      vm_size_kb=100,
+      vm_rss_kb=50000,
     ),
   )
   let filter = @modelprocfs.ProcessFilter::new()
@@ -141,9 +185,13 @@ test "filter returns empty when no match" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   let filter = @modelprocfs.ProcessFilter::new().with_name_contains("nope")
@@ -156,16 +204,24 @@ test "find_by_name returns first exact match" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=10, ppid=0, name="bash",
+      pid=10,
+      ppid=0,
+      name="bash",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=100, vm_rss_kb=100,
+      threads=1,
+      vm_size_kb=100,
+      vm_rss_kb=100,
     ),
   )
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=20, ppid=10, name="bash",
+      pid=20,
+      ppid=10,
+      name="bash",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=100, vm_rss_kb=100,
+      threads=1,
+      vm_size_kb=100,
+      vm_rss_kb=100,
     ),
   )
   let found = tree.find_by_name("bash").unwrap()
@@ -183,23 +239,35 @@ test "find_by_state groups processes" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="a",
+      pid=1,
+      ppid=0,
+      name="a",
       state=@modelprocfs.ProcessState::Running,
-      threads=1, vm_size_kb=1, vm_rss_kb=1,
+      threads=1,
+      vm_size_kb=1,
+      vm_rss_kb=1,
     ),
   )
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=2, ppid=0, name="b",
+      pid=2,
+      ppid=0,
+      name="b",
       state=@modelprocfs.ProcessState::Running,
-      threads=1, vm_size_kb=1, vm_rss_kb=1,
+      threads=1,
+      vm_size_kb=1,
+      vm_rss_kb=1,
     ),
   )
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=3, ppid=0, name="c",
+      pid=3,
+      ppid=0,
+      name="c",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=1, vm_rss_kb=1,
+      threads=1,
+      vm_size_kb=1,
+      vm_rss_kb=1,
     ),
   )
   let running = tree.find_by_state(@modelprocfs.ProcessState::Running)

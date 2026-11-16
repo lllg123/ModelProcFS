@@ -22,9 +22,9 @@ pub(all) enum FdType {
 /// `flags` holds the raw `O_*` bits from `fcntl(fd, F_GETFD)`.
 #derive(Debug, Eq)
 pub(all) struct FileDescriptor {
-  fd : Int
+  fd : Int32
   fd_type : FdType
-  flags : Int
+  flags : Int32
 }
 
 ///|
@@ -36,9 +36,9 @@ pub extend FdType with Eq::{not_equal, equal}
 ///|
 /// Creates a validated file descriptor entry.
 pub fn FileDescriptor::new(
-  fd~ : Int,
+  fd~ : Int32,
   fd_type~ : FdType,
-  flags~ : Int,
+  flags~ : Int32,
 ) -> FileDescriptor raise ProcFSError {
   if fd < 0 {
     raise ProcFSError::InvalidFdNumber(fd)
@@ -76,7 +76,7 @@ pub fn FdTable::new() -> FdTable {
 
 ///|
 /// Number of fds currently in the table.
-pub fn FdTable::count(self : FdTable) -> Int {
+pub fn FdTable::count(self : FdTable) -> Int32 {
   self.entries.length()
 }
 
@@ -97,7 +97,7 @@ pub fn FdTable::add(
 
 ///|
 /// Removes a descriptor by fd number.  Idempotent when the fd is not found.
-pub fn FdTable::remove(self : FdTable, fd_number : Int) -> Unit {
+pub fn FdTable::remove(self : FdTable, fd_number : Int32) -> Unit {
   let mut index = -1
   for i, entry in self.entries {
     if entry.fd == fd_number {
@@ -111,7 +111,7 @@ pub fn FdTable::remove(self : FdTable, fd_number : Int) -> Unit {
 
 ///|
 /// Finds a descriptor by fd number, or `None` when absent.
-pub fn FdTable::find(self : FdTable, fd_number : Int) -> FileDescriptor? {
+pub fn FdTable::find(self : FdTable, fd_number : Int32) -> FileDescriptor? {
   for entry in self.entries {
     if entry.fd == fd_number {
       return Some(entry)
@@ -122,7 +122,10 @@ pub fn FdTable::find(self : FdTable, fd_number : Int) -> FileDescriptor? {
 
 ///|
 /// Returns a snapshot of every descriptor of a given kind.
-pub fn FdTable::list_by_type(self : FdTable, kind : FdType) -> Array[FileDescriptor] {
+pub fn FdTable::list_by_type(
+  self : FdTable,
+  kind : FdType,
+) -> Array[FileDescriptor] {
   let result = []
   for entry in self.entries {
     if entry.fd_type == kind {

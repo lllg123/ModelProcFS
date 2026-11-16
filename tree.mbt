@@ -123,39 +123,42 @@ pub fn ProcTree::query(
     let pid = pids[i]
     match self.get_process_node(pid) {
       None => continue
-      Some(node) => match node.find_child("status") {
-        None => continue
-        Some(status) => match status.lookup("Name") {
+      Some(node) =>
+        match node.find_child("status") {
           None => continue
-          Some(name) => match status.lookup("State") {
-            None => continue
-            Some(state_code) =>
-              match ProcessState::from_code(state_code[:1].to_owned()) {
-                None => continue
-                Some(s) => {
-                  let process = try Process::new(
-                    pid~,
-                    ppid=parse_pid_field(status, "PPid"),
-                    name~,
-                    state=s,
-                    threads=parse_int_field(status, "Threads"),
-                    vm_size_kb=parse_kb_field(status, "VmSize"),
-                    vm_rss_kb=parse_kb_field(status, "VmRSS"),
-                  ) catch {
-                    _ => continue
-                  }
-                  let fp = match fd_tables {
-                    Some(m) => m.get(pid)
-                    None => None
-                  }
-                  if filter.matches(process, fp) {
-                    results.push(process)
-                  }
+          Some(status) =>
+            match status.lookup("Name") {
+              None => continue
+              Some(name) =>
+                match status.lookup("State") {
+                  None => continue
+                  Some(state_code) =>
+                    match ProcessState::from_code(state_code[:1].to_owned()) {
+                      None => continue
+                      Some(s) => {
+                        let process = Process::new(
+                          pid~,
+                          ppid=parse_pid_field(status, "PPid"),
+                          name~,
+                          state=s,
+                          threads=parse_int_field(status, "Threads"),
+                          vm_size_kb=parse_kb_field(status, "VmSize"),
+                          vm_rss_kb=parse_kb_field(status, "VmRSS"),
+                        ) catch {
+                          _ => continue
+                        }
+                        let fp = match fd_tables {
+                          Some(m) => m.get(pid)
+                          None => None
+                        }
+                        if filter.matches(process, fp) {
+                          results.push(process)
+                        }
+                      }
+                    }
                 }
-              }
-          }
+            }
         }
-      }
     }
   }
   results
@@ -163,10 +166,7 @@ pub fn ProcTree::query(
 
 ///|
 /// Returns the first process whose name equals `name`, or `None`.
-pub fn ProcTree::find_by_name(
-  self : ProcTree,
-  name : String,
-) -> Process? {
+pub fn ProcTree::find_by_name(self : ProcTree, name : String) -> Process? {
   let filter = ProcessFilter::new().with_name_contains(name)
   let matches = self.query(filter)
   for m in matches {
@@ -228,7 +228,7 @@ pub extend ProcTree with Eq::{not_equal, equal}
 /// Extracts a pid-like int field from a status key-value node.
 fn parse_pid_field(status : ProcNode, key : String) -> Int32 {
   match status.lookup(key) {
-    Some(v) => try @string.parse_int(v) catch { _ => 0 }
+    Some(v) => @string.parse_int(v) catch { _ => 0 }
     None => 0
   }
 }
@@ -237,7 +237,7 @@ fn parse_pid_field(status : ProcNode, key : String) -> Int32 {
 /// Extracts a plain integer field from a status key-value node.
 fn parse_int_field(status : ProcNode, key : String) -> Int32 {
   match status.lookup(key) {
-    Some(v) => try @string.parse_int(v) catch { _ => 0 }
+    Some(v) => @string.parse_int(v) catch { _ => 0 }
     None => 0
   }
 }
@@ -256,7 +256,9 @@ fn parse_kb_field(status : ProcNode, key : String) -> Int32 {
       while j < trimmed.length() && trimmed[j] != ' ' {
         j = j + 1
       }
-      try @string.parse_int(trimmed[:j].to_owned()) catch { _ => 0 }
+      @string.parse_int(trimmed[:j].to_owned()) catch {
+        _ => 0
+      }
     }
     None => 0
   }

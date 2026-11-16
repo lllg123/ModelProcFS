@@ -37,7 +37,9 @@ test "serialize fd list with pipe" {
   let t = @modelprocfs.FdTable::new()
   t.add(
     @modelprocfs.FileDescriptor::new(
-      fd=0, fd_type=@modelprocfs.FdType::Pipe, flags=0,
+      fd=0,
+      fd_type=@modelprocfs.FdType::Pipe,
+      flags=0,
     ),
   )
   let pairs = @modelprocfs.serialize_fd_list(t)
@@ -50,17 +52,23 @@ test "serialize fd list with special fd types" {
   let t = @modelprocfs.FdTable::new()
   t.add(
     @modelprocfs.FileDescriptor::new(
-      fd=5, fd_type=@modelprocfs.FdType::EventFd, flags=0,
+      fd=5,
+      fd_type=@modelprocfs.FdType::EventFd,
+      flags=0,
     ),
   )
   t.add(
     @modelprocfs.FileDescriptor::new(
-      fd=6, fd_type=@modelprocfs.FdType::Epoll, flags=0,
+      fd=6,
+      fd_type=@modelprocfs.FdType::Epoll,
+      flags=0,
     ),
   )
   t.add(
     @modelprocfs.FileDescriptor::new(
-      fd=7, fd_type=@modelprocfs.FdType::Inotify, flags=0,
+      fd=7,
+      fd_type=@modelprocfs.FdType::Inotify,
+      flags=0,
     ),
   )
   let pairs = @modelprocfs.serialize_fd_list(t)
@@ -119,9 +127,7 @@ test "inode values are stable per fd number and type" {
   let pairs_b = @modelprocfs.FdTable::new()
   pairs_b.add(b)
   let target_b = @modelprocfs.serialize_fd_list(pairs_b)[0].1
-  // Same fd+type produce the same inode, path differs
   assert_eq(target_a, "/x")
   assert_eq(target_b, "/y")
-  // Both are regular files, no inode bracket syntax
   assert_false(target_a.has_prefix("socket"))
 }

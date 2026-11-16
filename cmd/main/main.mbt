@@ -3,11 +3,47 @@
 /// running filters, computing aggregate stats, and printing a summary.
 fn main {
   let tree = @modelprocfs.ProcTree::new()
-  add_sample(tree, 1, 0, "systemd", @modelprocfs.ProcessState::Sleeping, 1, 102400, 8192)
+  add_sample(
+    tree,
+    1,
+    0,
+    "systemd",
+    @modelprocfs.ProcessState::Sleeping,
+    1,
+    102400,
+    8192,
+  )
   add_sample(tree, 2, 0, "kthreadd", @modelprocfs.ProcessState::Idle, 1, 0, 0)
-  add_sample(tree, 7, 1, "worker", @modelprocfs.ProcessState::Running, 4, 65536, 16384)
-  add_sample(tree, 42, 1, "sshd", @modelprocfs.ProcessState::Sleeping, 2, 32768, 4096)
-  add_sample(tree, 99, 7, "worker-crash", @modelprocfs.ProcessState::Zombie, 1, 65536, 0)
+  add_sample(
+    tree,
+    7,
+    1,
+    "worker",
+    @modelprocfs.ProcessState::Running,
+    4,
+    65536,
+    16384,
+  )
+  add_sample(
+    tree,
+    42,
+    1,
+    "sshd",
+    @modelprocfs.ProcessState::Sleeping,
+    2,
+    32768,
+    4096,
+  )
+  add_sample(
+    tree,
+    99,
+    7,
+    "worker-crash",
+    @modelprocfs.ProcessState::Zombie,
+    1,
+    65536,
+    0,
+  )
 
   println("=== ModelProcFS Demo ===")
   let stats = @modelprocfs.compute_stats(tree)
@@ -62,8 +98,14 @@ fn add_sample(
   vm_size_kb : Int32,
   vm_rss_kb : Int32,
 ) -> Unit {
-  let p = try @modelprocfs.Process::new(
-    pid~, ppid~, name~, state~, threads~, vm_size_kb~, vm_rss_kb~,
+  let p = @modelprocfs.Process::new(
+    pid~,
+    ppid~,
+    name~,
+    state~,
+    threads~,
+    vm_size_kb~,
+    vm_rss_kb~,
   ) catch {
     _ => return
   }

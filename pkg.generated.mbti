@@ -1,11 +1,306 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "jjyiiuy/modelprocfs"
 
+import {
+  "moonbitlang/core/debug",
+}
+
 // Values
+pub fn compute_stats(ProcTree, fd_tables? : Map[Int32, FdTable]?) -> SystemStats
+
+pub fn diff_snapshots(ProcFSSnapshot, ProcFSSnapshot) -> SnapshotDiff
+
+pub fn parse_fd_symlink(String) -> FdType
+
+pub fn parse_maps(String) -> MemoryMap raise ProcFSError
+
+pub fn parse_status(String) -> Process raise ProcFSError
+
+pub fn serialize_fd_list(FdTable) -> Array[(Int32, String)]
+
+pub fn serialize_maps(MemoryMap) -> String
+
+pub fn serialize_status(Process) -> String
 
 // Errors
+#derive(Eq, @debug.Debug)
+pub(all) suberror ProcFSError {
+  InvalidPid(Int32)
+  EmptyProcessName
+  InvalidThreadCount(Int32)
+  InvalidVmSize(Int32)
+  InvalidVmRSS(Int32)
+  InvalidFdNumber(Int32)
+  FdAlreadyExists(Int32)
+  InvalidMemoryRange(Int32, Int32)
+  InvalidMemoryPerms(String)
+  ProcessNotFound(Int32)
+  ProcessAlreadyExists(Int32)
+  InvalidProcPath(String)
+  ParseError(String)
+}
+pub fn ProcFSError::equal(Self, Self) -> Bool
+pub fn ProcFSError::not_equal(Self, Self) -> Bool
+pub fn ProcFSError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+#derive(Eq, @debug.Debug)
+pub(all) struct FdTable {
+  entries : Array[FileDescriptor]
+}
+pub fn FdTable::add(Self, FileDescriptor) -> Unit raise ProcFSError
+pub fn FdTable::count(Self) -> Int32
+pub fn FdTable::equal(Self, Self) -> Bool
+pub fn FdTable::find(Self, Int32) -> FileDescriptor?
+pub fn FdTable::list_by_type(Self, FdType) -> Array[FileDescriptor]
+pub fn FdTable::new() -> Self
+pub fn FdTable::not_equal(Self, Self) -> Bool
+pub fn FdTable::remove(Self, Int32) -> Unit
+pub fn FdTable::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) enum FdType {
+  RegularFile(String)
+  Socket(String, String, String)
+  Pipe
+  EventFd
+  TimerFd
+  SignalFd
+  Epoll
+  Inotify
+  AnonymousInode
+}
+pub fn FdType::equal(Self, Self) -> Bool
+pub fn FdType::not_equal(Self, Self) -> Bool
+pub fn FdType::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct FileDescriptor {
+  fd : Int32
+  fd_type : FdType
+  flags : Int32
+}
+pub fn FileDescriptor::equal(Self, Self) -> Bool
+pub fn FileDescriptor::is_reg(Self) -> Bool
+pub fn FileDescriptor::is_socket(Self) -> Bool
+pub fn FileDescriptor::new(fd~ : Int32, fd_type~ : FdType, flags~ : Int32) -> Self raise ProcFSError
+pub fn FileDescriptor::not_equal(Self, Self) -> Bool
+pub fn FileDescriptor::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct MemPerms {
+  read : Bool
+  write : Bool
+  execute : Bool
+  shared : Bool
+  private : Bool
+}
+pub fn MemPerms::equal(Self, Self) -> Bool
+pub fn MemPerms::from_string(String) -> Self?
+pub fn MemPerms::new(read~ : Bool, write~ : Bool, execute~ : Bool, shared~ : Bool, private~ : Bool) -> Self raise ProcFSError
+pub fn MemPerms::not_equal(Self, Self) -> Bool
+pub fn MemPerms::to_repr(Self) -> @debug.Repr
+pub fn MemPerms::to_string(Self) -> String
+
+#derive(Eq, @debug.Debug)
+pub(all) struct MemoryMap {
+  regions : Array[MemoryRegion]
+}
+pub fn MemoryMap::add(Self, MemoryRegion) -> Unit
+pub fn MemoryMap::anonymous_size(Self) -> Int32
+pub fn MemoryMap::count(Self) -> Int32
+pub fn MemoryMap::equal(Self, Self) -> Bool
+pub fn MemoryMap::find_region(Self, Int32) -> MemoryRegion?
+pub fn MemoryMap::new() -> Self
+pub fn MemoryMap::not_equal(Self, Self) -> Bool
+pub fn MemoryMap::regions_by_path(Self, String) -> Array[MemoryRegion]
+pub fn MemoryMap::to_repr(Self) -> @debug.Repr
+pub fn MemoryMap::total_size(Self) -> Int32
+
+#derive(Eq, @debug.Debug)
+pub(all) struct MemoryRegion {
+  start : Int32
+  end : Int32
+  perms : MemPerms
+  offset : Int32
+  dev_major : Int32
+  dev_minor : Int32
+  inode : Int32
+  path : String?
+}
+pub fn MemoryRegion::equal(Self, Self) -> Bool
+pub fn MemoryRegion::is_anonymous(Self) -> Bool
+pub fn MemoryRegion::new(start~ : Int32, end~ : Int32, perms~ : MemPerms, offset~ : Int32, dev_major~ : Int32, dev_minor~ : Int32, inode~ : Int32, path~ : String?) -> Self raise ProcFSError
+pub fn MemoryRegion::not_equal(Self, Self) -> Bool
+pub fn MemoryRegion::size(Self) -> Int32
+pub fn MemoryRegion::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) enum ProcEntry {
+  Text(String)
+  KeyValue(Map[String, String])
+  Table(Array[Array[String]])
+}
+pub fn ProcEntry::equal(Self, Self) -> Bool
+pub fn ProcEntry::is_text(Self) -> Bool
+pub fn ProcEntry::lookup(Self, String) -> String?
+pub fn ProcEntry::not_equal(Self, Self) -> Bool
+pub fn ProcEntry::text_value(Self) -> String?
+pub fn ProcEntry::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ProcFSSnapshot {
+  captured_at : String
+  processes : Array[Process]
+}
+pub fn ProcFSSnapshot::equal(Self, Self) -> Bool
+pub fn ProcFSSnapshot::new(captured_at~ : String, ProcTree) -> Self
+pub fn ProcFSSnapshot::not_equal(Self, Self) -> Bool
+pub fn ProcFSSnapshot::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) enum ProcNode {
+  File(name~ : String, content~ : ProcEntry)
+  Directory(name~ : String, children~ : Array[ProcNode])
+  Symlink(name~ : String, target~ : String)
+}
+pub fn ProcNode::add_child(Self, Self) -> Unit
+pub fn ProcNode::child_names(Self) -> Array[String]
+pub fn ProcNode::equal(Self, Self) -> Bool
+pub fn ProcNode::find_child(Self, String) -> Self?
+pub fn ProcNode::is_directory(Self) -> Bool
+pub fn ProcNode::is_file(Self) -> Bool
+pub fn ProcNode::is_symlink(Self) -> Bool
+pub fn ProcNode::lookup(Self, String) -> String?
+pub fn ProcNode::name(Self) -> String
+pub fn ProcNode::not_equal(Self, Self) -> Bool
+pub fn ProcNode::remove_child(Self, String) -> Unit
+pub fn ProcNode::text_value(Self) -> String?
+pub fn ProcNode::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ProcTree {
+  root : ProcNode
+}
+pub fn ProcTree::add_process(Self, Process) -> Unit raise ProcFSError
+pub fn ProcTree::equal(Self, Self) -> Bool
+pub fn ProcTree::find_by_name(Self, String) -> Process?
+pub fn ProcTree::find_by_state(Self, ProcessState) -> Array[Process]
+pub fn ProcTree::get_process_node(Self, Int32) -> ProcNode?
+pub fn ProcTree::list_pids(Self) -> Array[Int32]
+pub fn ProcTree::new() -> Self
+pub fn ProcTree::not_equal(Self, Self) -> Bool
+pub fn ProcTree::process_count(Self) -> Int32
+pub fn ProcTree::query(Self, ProcessFilter, fd_tables? : Map[Int32, FdTable]?) -> Array[Process]
+pub fn ProcTree::remove_process(Self, Int32) -> Unit
+pub fn ProcTree::resolve(Self, String) -> ProcNode?
+pub fn ProcTree::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Process {
+  pid : Int32
+  ppid : Int32
+  name : String
+  state : ProcessState
+  threads : Int32
+  vm_size_kb : Int32
+  vm_rss_kb : Int32
+}
+pub fn Process::equal(Self, Self) -> Bool
+pub fn Process::new(pid~ : Int32, ppid~ : Int32, name~ : String, state~ : ProcessState, threads~ : Int32, vm_size_kb~ : Int32, vm_rss_kb~ : Int32) -> Self raise ProcFSError
+pub fn Process::not_equal(Self, Self) -> Bool
+pub fn Process::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ProcessDiff {
+  pid : Int32
+  added : Bool
+  removed : Bool
+  state_changed : Bool
+  from_state : ProcessState?
+  to_state : ProcessState?
+  vm_rss_delta_kb : Int32
+  thread_delta : Int32
+}
+pub fn ProcessDiff::equal(Self, Self) -> Bool
+pub fn ProcessDiff::not_equal(Self, Self) -> Bool
+pub fn ProcessDiff::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ProcessFilter {
+  name_contains : String?
+  state : ProcessState?
+  min_rss_kb : Int32?
+  max_rss_kb : Int32?
+  min_threads : Int32?
+  max_threads : Int32?
+  min_fds : Int32?
+  has_fd_type : FdType?
+}
+pub fn ProcessFilter::equal(Self, Self) -> Bool
+pub fn ProcessFilter::matches(Self, Process, FdTable?) -> Bool
+pub fn ProcessFilter::new() -> Self
+pub fn ProcessFilter::not_equal(Self, Self) -> Bool
+pub fn ProcessFilter::to_repr(Self) -> @debug.Repr
+pub fn ProcessFilter::with_fd_type(Self, FdType) -> Self
+pub fn ProcessFilter::with_max_rss_kb(Self, Int32) -> Self
+pub fn ProcessFilter::with_max_threads(Self, Int32) -> Self
+pub fn ProcessFilter::with_min_fds(Self, Int32) -> Self
+pub fn ProcessFilter::with_min_rss_kb(Self, Int32) -> Self
+pub fn ProcessFilter::with_min_threads(Self, Int32) -> Self
+pub fn ProcessFilter::with_name_contains(Self, String) -> Self
+pub fn ProcessFilter::with_state(Self, ProcessState) -> Self
+
+#derive(Eq, @debug.Debug)
+pub(all) enum ProcessState {
+  Running
+  Sleeping
+  DiskSleep
+  Zombie
+  Stopped
+  TracingStop
+  Dead
+  Idle
+}
+pub fn ProcessState::equal(Self, Self) -> Bool
+pub fn ProcessState::from_code(String) -> Self?
+pub fn ProcessState::label(Self) -> String
+pub fn ProcessState::not_equal(Self, Self) -> Bool
+pub fn ProcessState::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SnapshotDiff {
+  before : String
+  after : String
+  diffs : Array[ProcessDiff]
+}
+pub fn SnapshotDiff::equal(Self, Self) -> Bool
+pub fn SnapshotDiff::not_equal(Self, Self) -> Bool
+pub fn SnapshotDiff::summary(Self) -> String
+pub fn SnapshotDiff::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct StateCount {
+  state : ProcessState
+  count : Int32
+}
+pub fn StateCount::equal(Self, Self) -> Bool
+pub fn StateCount::not_equal(Self, Self) -> Bool
+pub fn StateCount::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SystemStats {
+  total_processes : Int32
+  total_threads : Int32
+  total_vm_kb : Int32
+  total_rss_kb : Int32
+  total_fds : Int32
+  state_counts : Array[StateCount]
+}
+pub fn SystemStats::count_for(Self, ProcessState) -> Int32
+pub fn SystemStats::equal(Self, Self) -> Bool
+pub fn SystemStats::not_equal(Self, Self) -> Bool
+pub fn SystemStats::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 

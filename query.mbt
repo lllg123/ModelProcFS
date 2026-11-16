@@ -153,7 +153,12 @@ pub fn ProcessFilter::matches(
         None => ()
       }
       match self.has_fd_type {
-        Some(ty) => if t.list_by_type(ty).length() == 0 { return false } else { () }
+        Some(ty) =>
+          if t.list_by_type(ty).length() == 0 {
+            return false
+          } else {
+            ()
+          }
         None => ()
       }
     }

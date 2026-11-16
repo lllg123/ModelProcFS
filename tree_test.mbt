@@ -9,9 +9,13 @@ test "empty tree has no processes" {
 test "add process creates pid directory with status and fd" {
   let tree = @modelprocfs.ProcTree::new()
   let p = @modelprocfs.Process::new(
-    pid=1, ppid=0, name="systemd",
+    pid=1,
+    ppid=0,
+    name="systemd",
     state=@modelprocfs.ProcessState::Sleeping,
-    threads=1, vm_size_kb=102400, vm_rss_kb=8192,
+    threads=1,
+    vm_size_kb=102400,
+    vm_rss_kb=8192,
   )
   tree.add_process(p)
   assert_eq(tree.process_count(), 1)
@@ -34,16 +38,24 @@ test "add multiple processes and list pids" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=42, ppid=1, name="sshd",
+      pid=42,
+      ppid=1,
+      name="sshd",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=2, vm_size_kb=32768, vm_rss_kb=4096,
+      threads=2,
+      vm_size_kb=32768,
+      vm_rss_kb=4096,
     ),
   )
   assert_eq(tree.process_count(), 2)
@@ -56,9 +68,13 @@ test "remove process by pid" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=7, ppid=1, name="worker",
+      pid=7,
+      ppid=1,
+      name="worker",
       state=@modelprocfs.ProcessState::Running,
-      threads=4, vm_size_kb=65536, vm_rss_kb=8192,
+      threads=4,
+      vm_size_kb=65536,
+      vm_rss_kb=8192,
     ),
   )
   assert_eq(tree.process_count(), 1)
@@ -72,9 +88,13 @@ test "remove absent pid is no-op" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   assert_eq(tree.process_count(), 1)
@@ -87,17 +107,25 @@ test "reject duplicate pid" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   try {
     tree.add_process(
       @modelprocfs.Process::new(
-        pid=1, ppid=1, name="clone",
+        pid=1,
+        ppid=1,
+        name="clone",
         state=@modelprocfs.ProcessState::Running,
-        threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+        threads=1,
+        vm_size_kb=4096,
+        vm_rss_kb=1024,
       ),
     )
     abort("expected ProcFSError")
@@ -112,9 +140,13 @@ test "resolve path to process status file" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="systemd",
+      pid=1,
+      ppid=0,
+      name="systemd",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=102400, vm_rss_kb=8192,
+      threads=1,
+      vm_size_kb=102400,
+      vm_rss_kb=8192,
     ),
   )
   // resolve pid directory
@@ -156,7 +188,10 @@ test "resolve returns None for missing path" {
 test "list_pids ignores non-numeric children" {
   let tree = @modelprocfs.ProcTree::new()
   // add a non-pid file at /proc level
-  tree.resolve("/proc").unwrap().add_child(
+  tree
+  .resolve("/proc")
+  .unwrap()
+  .add_child(
     @modelprocfs.ProcNode::File(
       name="version",
       content=@modelprocfs.ProcEntry::Text("5.15"),
@@ -164,9 +199,13 @@ test "list_pids ignores non-numeric children" {
   )
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   assert_eq(tree.list_pids(), [1])
@@ -178,17 +217,25 @@ test "process count reflects adds and removes" {
   assert_eq(tree.process_count(), 0)
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="a",
+      pid=1,
+      ppid=0,
+      name="a",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=1, vm_rss_kb=1,
+      threads=1,
+      vm_size_kb=1,
+      vm_rss_kb=1,
     ),
   )
   assert_eq(tree.process_count(), 1)
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=2, ppid=1, name="b",
+      pid=2,
+      ppid=1,
+      name="b",
       state=@modelprocfs.ProcessState::Running,
-      threads=1, vm_size_kb=1, vm_rss_kb=1,
+      threads=1,
+      vm_size_kb=1,
+      vm_rss_kb=1,
     ),
   )
   assert_eq(tree.process_count(), 2)

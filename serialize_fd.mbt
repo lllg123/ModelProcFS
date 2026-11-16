@@ -1,6 +1,6 @@
 ///|
 /// Computes a stable pseudo-inode number from an fd entry.
-fn fd_inode(fd : FileDescriptor) -> Int {
+fn fd_inode(fd : FileDescriptor) -> Int32 {
   let base = match fd.fd_type {
     RegularFile(_) => 0x100000
     Socket(_, _, _) => 0x200000
@@ -35,7 +35,7 @@ fn fd_symlink_target(fd : FileDescriptor) -> String {
 ///|
 /// Serializes an `FdTable` into a list of `(fd_number, symlink_target)` pairs,
 /// matching the contents of `/proc/[pid]/fd/`.
-pub fn serialize_fd_list(table : FdTable) -> Array[(Int, String)] {
+pub fn serialize_fd_list(table : FdTable) -> Array[(Int32, String)] {
   let result = []
   for i = 0; i < table.entries.length(); i = i + 1 {
     let entry = table.entries[i]

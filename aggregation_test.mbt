@@ -13,9 +13,13 @@ test "stats on single process" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=4096, vm_rss_kb=1024,
+      threads=1,
+      vm_size_kb=4096,
+      vm_rss_kb=1024,
     ),
   )
   let stats = @modelprocfs.compute_stats(tree)
@@ -30,16 +34,24 @@ test "stats accumulates across multiple processes" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="a",
+      pid=1,
+      ppid=0,
+      name="a",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=2, vm_size_kb=1000, vm_rss_kb=500,
+      threads=2,
+      vm_size_kb=1000,
+      vm_rss_kb=500,
     ),
   )
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=2, ppid=0, name="b",
+      pid=2,
+      ppid=0,
+      name="b",
       state=@modelprocfs.ProcessState::Running,
-      threads=4, vm_size_kb=2000, vm_rss_kb=1000,
+      threads=4,
+      vm_size_kb=2000,
+      vm_rss_kb=1000,
     ),
   )
   let stats = @modelprocfs.compute_stats(tree)
@@ -56,20 +68,28 @@ test "stats with fd tables" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
     @modelprocfs.Process::new(
-      pid=1, ppid=0, name="init",
+      pid=1,
+      ppid=0,
+      name="init",
       state=@modelprocfs.ProcessState::Sleeping,
-      threads=1, vm_size_kb=100, vm_rss_kb=100,
+      threads=1,
+      vm_size_kb=100,
+      vm_rss_kb=100,
     ),
   )
   let t = @modelprocfs.FdTable::new()
   t.add(
     @modelprocfs.FileDescriptor::new(
-      fd=0, fd_type=@modelprocfs.FdType::Pipe, flags=0,
+      fd=0,
+      fd_type=@modelprocfs.FdType::Pipe,
+      flags=0,
     ),
   )
   t.add(
     @modelprocfs.FileDescriptor::new(
-      fd=1, fd_type=@modelprocfs.FdType::RegularFile("/log"), flags=0,
+      fd=1,
+      fd_type=@modelprocfs.FdType::RegularFile("/log"),
+      flags=0,
     ),
   )
   let tables = Map([(1, t)])

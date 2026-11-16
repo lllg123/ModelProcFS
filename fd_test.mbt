@@ -15,9 +15,7 @@ test "construct regular file fd" {
 test "construct socket fd" {
   let fd = @modelprocfs.FileDescriptor::new(
     fd=4,
-    fd_type=@modelprocfs.FdType::Socket(
-      "TCP", "10.0.0.1:54321", "10.0.0.2:80",
-    ),
+    fd_type=@modelprocfs.FdType::Socket("TCP", "10.0.0.1:54321", "10.0.0.2:80"),
     flags=0,
   )
   assert_eq(fd.fd, 4)
