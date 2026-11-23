@@ -105,4 +105,6 @@ moon fmt
 
 ## 许可证
 
-Apache-2.0
+Copyright 2026 lllg123.
+
+ModelProcFS 按 Apache License 2.0（SPDX：`Apache-2.0`）开源，适用于本仓库的原创代码与文档。项目级许可证全文见根目录 [LICENSE](LICENSE)，与 `moon.mod` 中的许可声明一致。第三方组件仍遵循其各自的许可证。
