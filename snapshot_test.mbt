@@ -185,6 +185,61 @@ test "diff summary includes added process" {
 }
 
 ///|
+test "PID reuse is detected with identity conflict" {
+  // Simulates: worker (pid=7) crashes and exits between T1 and T2;
+  // the kernel reuses PID 7 for a new process "logger".
+  let tree = @modelprocfs.ProcTree::new()
+  tree.add_process(
+    @modelprocfs.Process::new(
+      pid=7,
+      ppid=1,
+      name="worker",
+      state=@modelprocfs.ProcessState::Running,
+      threads=4,
+      vm_size_kb=65536,
+      vm_rss_kb=16384,
+      start_time_ticks=Some(1500L),
+    ),
+  )
+  let before = @modelprocfs.ProcFSSnapshot::new(captured_at="T1", tree)
+  tree.remove_process(7)
+  tree.add_process(
+    @modelprocfs.Process::new(
+      pid=7,
+      ppid=1,
+      name="logger",
+      state=@modelprocfs.ProcessState::Sleeping,
+      threads=1,
+      vm_size_kb=8192,
+      vm_rss_kb=2048,
+      start_time_ticks=Some(8000L),
+    ),
+  )
+  let after = @modelprocfs.ProcFSSnapshot::new(captured_at="T2", tree)
+  let diff = @modelprocfs.diff_snapshots(before, after)
+  // Expect 2 diffs: worker removed, logger added, both with conflict flag
+  assert_eq(diff.diffs.length(), 2)
+  let mut saw_removed = false
+  let mut saw_added = false
+  for i = 0; i < diff.diffs.length(); i = i + 1 {
+    let d = diff.diffs[i]
+    assert_true(d.identity_conflict)
+    if d.removed {
+      saw_removed = true
+      assert_eq(d.pid, 7)
+      assert_eq(d.from_state, Some(@modelprocfs.ProcessState::Running))
+    }
+    if d.added {
+      saw_added = true
+      assert_eq(d.pid, 7)
+      assert_eq(d.to_state, Some(@modelprocfs.ProcessState::Sleeping))
+    }
+  }
+  assert_true(saw_removed)
+  assert_true(saw_added)
+}
+
+///|
 test "process diff vm_rss_delta tracks changes" {
   let tree = @modelprocfs.ProcTree::new()
   tree.add_process(
