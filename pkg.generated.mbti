@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "jjyiiuy/modelprocfs"
+package "lllg123/modelprocfs"
 
 import {
   "moonbitlang/core/debug",
@@ -38,6 +38,7 @@ pub(all) suberror ProcFSError {
   ProcessAlreadyExists(Int32)
   InvalidProcPath(String)
   ParseError(String)
+  IdentityConflict(Int32, Int64, Int64)
 }
 pub fn ProcFSError::equal(Self, Self) -> Bool
 pub fn ProcFSError::not_equal(Self, Self) -> Bool
@@ -205,17 +206,21 @@ pub(all) struct Process {
   threads : Int32
   vm_size_kb : Int32
   vm_rss_kb : Int32
+  start_time_ticks : Int64?
 }
 pub fn Process::equal(Self, Self) -> Bool
-pub fn Process::new(pid~ : Int32, ppid~ : Int32, name~ : String, state~ : ProcessState, threads~ : Int32, vm_size_kb~ : Int32, vm_rss_kb~ : Int32) -> Self raise ProcFSError
+pub fn Process::identity(Self) -> ProcessIdentity
+pub fn Process::new(pid~ : Int32, ppid~ : Int32, name~ : String, state~ : ProcessState, threads~ : Int32, vm_size_kb~ : Int32, vm_rss_kb~ : Int32, start_time_ticks? : Int64?) -> Self raise ProcFSError
 pub fn Process::not_equal(Self, Self) -> Bool
 pub fn Process::to_repr(Self) -> @debug.Repr
 
 #derive(Eq, @debug.Debug)
 pub(all) struct ProcessDiff {
   pid : Int32
+  identity : ProcessIdentity
   added : Bool
   removed : Bool
+  identity_conflict : Bool
   state_changed : Bool
   from_state : ProcessState?
   to_state : ProcessState?
@@ -250,6 +255,17 @@ pub fn ProcessFilter::with_min_rss_kb(Self, Int32) -> Self
 pub fn ProcessFilter::with_min_threads(Self, Int32) -> Self
 pub fn ProcessFilter::with_name_contains(Self, String) -> Self
 pub fn ProcessFilter::with_state(Self, ProcessState) -> Self
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ProcessIdentity {
+  pid : Int32
+  start_time_ticks : Int64
+}
+pub fn ProcessIdentity::equal(Self, Self) -> Bool
+pub fn ProcessIdentity::new(pid~ : Int32, start_ticks~ : Int64) -> Self
+pub fn ProcessIdentity::not_equal(Self, Self) -> Bool
+pub fn ProcessIdentity::same_instance(Self, Self) -> Bool
+pub fn ProcessIdentity::to_repr(Self) -> @debug.Repr
 
 #derive(Eq, @debug.Debug)
 pub(all) enum ProcessState {

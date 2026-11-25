@@ -39,6 +39,13 @@ pub fn ProcTree::add_process(
     ("Threads", process.threads.to_string()),
     ("VmSize", "\{process.vm_size_kb} kB"),
     ("VmRSS", "\{process.vm_rss_kb} kB"),
+    (
+      "StartTime",
+      match process.start_time_ticks {
+        Some(t) => t.to_string()
+        None => ""
+      },
+    ),
   ])
   let status_file = ProcNode::File(
     name="status",

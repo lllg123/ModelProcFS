@@ -297,15 +297,18 @@ pub fn SnapshotDiff::summary(self : SnapshotDiff) -> String {
 ///|
 fn parse_start_ticks(status : ProcNode) -> Int64? {
   match status.lookup("StartTime") {
-    Some(v) =>
-      @string.parse_int(v) catch {
-        _ =>
-          match status.lookup("starttime") {
-            Some(v2) => @string.parse_int(v2) catch { _ => None }
-            None => None
-          }
+    Some(v) => {
+      let val = @string.parse_int(v) catch { _ => 0 }
+      Some(val.to_int64())
+    }
+    None =>
+      match status.lookup("starttime") {
+        Some(v2) => {
+          let val = @string.parse_int(v2) catch { _ => 0 }
+          Some(val.to_int64())
+        }
+        None => None
       }
-    None => None
   }
 }
 
