@@ -140,6 +140,27 @@ fn build_event(
 }
 
 ///|
+/// Returns true when moving from `from` to `to` violates kernel state rules.
+fn illegal_transition(from : ProcessState, to : ProcessState) -> Bool {
+  if from == to {
+    return false
+  }
+  // Zombie cannot go anywhere except Dead
+  if from == Zombie && to != Dead {
+    return true
+  }
+  // Dead is absorbing
+  if from == Dead && to != Dead {
+    return true
+  }
+  // Idle kernel thread should not transition to user states
+  if from == Idle && to != Idle && to != Running && to != Sleeping {
+    return true
+  }
+  false
+}
+
+///|
 /// Returns true when a diff entry represents a failure event.
 fn is_failure(d : ProcessDiff) -> Bool {
   if d.removed {
@@ -152,9 +173,10 @@ fn is_failure(d : ProcessDiff) -> Bool {
   if d.state_changed {
     match (d.from_state, d.to_state) {
       (Some(f), Some(t)) =>
-        match validate_transition(f, t) {
-          Invalid(_) => return true
-          Valid => ()
+        if illegal_transition(f, t) {
+          return true
+        } else {
+          ()
         }
       _ => ()
     }
